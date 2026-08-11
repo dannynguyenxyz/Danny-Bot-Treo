@@ -11,7 +11,6 @@ load_dotenv()
 # ====================== CẤU HÌNH ======================
 spam_file = "nhay.txt"
 whitelist_file = "whitelist.txt"
-LINES_PER_MESSAGE = 2
 
 STATUS_NAME = "𝑫𝒂𝒏𝒏𝒚 𝑿𝒊𝒏 𝑪𝒉𝒂𝒐"
 
@@ -74,7 +73,7 @@ async def create_bot(token):
     @bot.event
     async def on_ready():
         print(f'✅ Bot đã online: {bot.user}')
-        print(f'📁 File treo: {spam_file} | Số dòng/tin: {LINES_PER_MESSAGE}')
+        print(f'📁 File treo: {spam_file}')
         print(f'👑 Owner ID: {OWNER_ID}')
 
         activity = discord.Game(name=STATUS_NAME)
@@ -105,9 +104,9 @@ async def create_bot(token):
 
         if target_users_dict[bot_id]:
             mentions = " ".join(user.mention for user in target_users_dict[bot_id])
-            await ctx.send(f"🚀 **Bắt đầu treo!** ({LINES_PER_MESSAGE} dòng/tin)\nPing: {mentions}\nDùng `d!stop` để dừng.")
+            await ctx.send(f"🚀 **Bắt đầu treo!** (1 dòng ngẫu nhiên)\nPing: {mentions}\nDùng `d!stop` để dừng.")
         else:
-            await ctx.send(f"🚀 **Bắt đầu treo!** ({LINES_PER_MESSAGE} dòng/tin)\nDùng `d!stop` để dừng.")
+            await ctx.send("🚀 **Bắt đầu treo!** (1 dòng ngẫu nhiên)\nDùng `d!stop` để dừng.")
 
         spam_task_dict[bot_id] = asyncio.create_task(spam_loop(ctx, bot_id))
 
@@ -196,16 +195,9 @@ async def create_bot(token):
                 spamming_dict[bot_id] = False
                 return
 
-            i = 0
             while spamming_dict.get(bot_id, False):
-                if LINES_PER_MESSAGE == 1:
-                    message = random.choice(lines)
-                else:
-                    chunk = []
-                    for _ in range(LINES_PER_MESSAGE):
-                        chunk.append(lines[i % len(lines)])
-                        i += 1
-                    message = "\n".join(chunk)
+                # Mỗi lần gửi → lấy ngẫu nhiên 1 dòng
+                message = random.choice(lines)
 
                 if target_users_dict.get(bot_id):
                     mentions = " ".join(user.mention for user in target_users_dict[bot_id])
